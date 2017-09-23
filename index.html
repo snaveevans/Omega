@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Zen </title>
+    <title>Omega </title>
 </head>
 
 <body>
@@ -53,6 +53,7 @@
 
                 var input = {
                     $type: 'input',
+                    className: 'foobar',
                     style: 'margin: 5px; width: 100%;',
                     type: 'text',
                     onkeyup: function(e) {
@@ -191,6 +192,14 @@
                         _value: user.lastName,
                         _onKeyUp: function (e) {
                             onKeyUpHandler('lastName', e.target.value);
+                        }
+                    },
+                    {
+                        $type: 'Form-Input',
+                        _label: 'Birth Date:',
+                        _value: user.birthDate,
+                        _onKeyUp: function (e) {
+                            onKeyUpHandler('birthDate', e.target.value);
                         }
                     }
                 ]
