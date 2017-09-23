@@ -72,9 +72,6 @@ var Omega = Ω = function ($root, $node) {
             components: [],
             dirty: {}
         }
-        node.α = {}; // data
-        node.ß = []; // components
-        node.δ = {}; // dirty props
 
         var $type = node.$type;
         
@@ -82,7 +79,7 @@ var Omega = Ω = function ($root, $node) {
 
         var element = document.createElement(node.$type);
 
-        node.Γ = function () {
+        node.Ω.update = function () {
             updateNode(this.element, this.node);
         }.bind({ node, element });
 
@@ -122,12 +119,14 @@ var Omega = Ω = function ($root, $node) {
             components = components.map(mergeNodeIfTemplate);
         }
 
-        node.ß = components;
+        node.Ω.components = components;
         return components;
     }
 
     function getStoredComponents(node) {
-        return node.ß;
+        return node.Ω === undefined ? 
+            [] :
+            node.Ω.components;
     }
 
     function updateElement(parent, newNode, oldNode, refresh, index) {
@@ -156,7 +155,7 @@ var Omega = Ω = function ($root, $node) {
     }
 
     function updateNode(element, node) {
-        var oldProps = node.δ;
+        var oldProps = node.Ω.dirty;
 
         updateProps(element,
             node,
@@ -278,7 +277,7 @@ var Omega = Ω = function ($root, $node) {
     }
 
     function isOmegaProp(name) {
-        return name === 'α' || name === 'ß' || name === 'Ω' || name === 'δ';
+        return name === 'Ω';
     }
 
     function isFunction(value) {
@@ -320,16 +319,16 @@ var Omega = Ω = function ($root, $node) {
         });
     }
 
-    function getVariable(node, name) {
-        var value = node.α[name];
-        if (value !== undefined)
+    function getVariable(node, name, localOnly) {
+        var value = node.Ω.props[name];
+        if (value !== undefined || localOnly === true)
             return value;
 
         return node[name];
     }
 
     function setVariable(node, name, value) {
-        node.α[name] = value;
+        node.Ω.props[name] = value;
     }
 
     function addPropListeners(node) {
@@ -362,7 +361,7 @@ var Omega = Ω = function ($root, $node) {
                 return value;
             },
             set: function (value) {
-                if (JSON.stringify(node.α[name]) === JSON.stringify(value))
+                if (JSON.stringify(getVariable(node, name, true)) === JSON.stringify(value))
                     return;
 
                 snapshotVariable(node, name, getVariable(node, name));
@@ -373,7 +372,7 @@ var Omega = Ω = function ($root, $node) {
     }
 
     function snapshotVariable(node, name, value) {
-        node.δ[name] = JSON.stringify(value);
+        node.Ω.dirty[name] = JSON.stringify(value);
     }
 
     function areAnyVariablesDifferent(node) {
@@ -389,7 +388,7 @@ var Omega = Ω = function ($root, $node) {
     }
 
     function isVariableDifferent(node, name, value) {
-        var storedValue = node.δ[name];
+        var storedValue = node.Ω.dirty[name];
         var currentValue = JSON.stringify(value);
         return storedValue !== currentValue;
     }
@@ -427,7 +426,7 @@ var Omega = Ω = function ($root, $node) {
             getQueue().forEach(function (testNode) {
                 if (!areAnyVariablesDifferent(testNode))
                     return;
-                testNode.Γ.call();
+                testNode.Ω.update.call();
             })
 
             clearQueue();
