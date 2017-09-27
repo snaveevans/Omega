@@ -1,9 +1,12 @@
 
-// alpha    α   alt 224 -- data
-// beta      ß   alt 225 -- components
-// gamma Γ    alt 226 -- window queue
-// omega Ω   alt 234 -- re-render function
-// delta    δ    alt 235 -- dirty object
+// omega Ω   alt 234 -- 
+
+// delta        δ       alt 235
+// alpha        α       alt 224 
+// beta         ß       alt 225
+// gamma    Γ       alt 226
+
+// virtual dom reflects the actual dom
 
 // generate node from blueprint
 // wrapping prop's setters & getters in data object in element
@@ -119,6 +122,9 @@ var Omega = Ω = function ($root, $node) {
             components = components.map(mergeNodeIfTemplate);
         }
 
+        if (node.Ω === undefined)
+            node.Ω = {};
+            
         node.Ω.components = components;
         return components;
     }
