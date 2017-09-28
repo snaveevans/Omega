@@ -19,7 +19,7 @@
             $type: 'div',
             _items: [],
             _onAdd: function(item) {
-                this._items.push(item);
+                this._items.push({title: item});
             },
             $init: function () {
                 var options = {
@@ -31,9 +31,9 @@
                     }
                 };
             
-                fetch('https://jsonplaceholder.typicode.com/posts', options)
-                    .then(r => {return r.json(); })
-                    .then(posts => { this._items = posts; })
+                // fetch('https://jsonplaceholder.typicode.com/posts', options)
+                //     .then(r => {return r.json(); })
+                //     .then(posts => { this._items = posts; })
             },
             $getComponents: function() {
                 var items = this._items;
@@ -238,8 +238,8 @@
         omega.registerTemplate("My-Li", myLi);
 
         var root = document.getElementById('root');
-        omega.updateElement(root, form);
-        // omega.updateElement(root, httpFetchTest);
+        // omega.updateElement(root, form);
+        omega.updateElement(root, httpFetchTest);
     </script>
 </body>
 

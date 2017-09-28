@@ -7,32 +7,6 @@
 //      rendering
 
 var Omega = Ω = function ($root, $node, $templates) {
-    var Data = {
-        copy: function(value){
-            if(typeof value === 'object') {
-                return Data.clone(value);
-            } else {
-                return value;
-            }
-        },
-        clone: function(o){
-            var out, v, key;
-            out = Array.isArray(o) ? [] : {};
-            for (key in o) {
-                v = o[key];
-        
-                if (typeof v === 'object') {
-                    out[key] = copy(v)
-                } else if (typeof v === 'function') {
-                    out[key] = v.bind(out);
-                } else {
-                    out[key] = v;
-                }
-            }
-            return out;
-         }
-    }
-
     var Omega = {
         initialize: function(node) {
             node.Ω = {
@@ -473,6 +447,32 @@ var Omega = Ω = function ($root, $node, $templates) {
         clear: function(){
             Queue.nodes = [];
         }
+    }    
+
+    var Data = {
+        copy: function(value){
+            if(typeof value === 'object') {
+                return Data.clone(value);
+            } else {
+                return value;
+            }
+        },
+        clone: function(o){
+            var out, v, key;
+            out = Array.isArray(o) ? [] : {};
+            for (key in o) {
+                v = o[key];
+        
+                if (typeof v === 'object') {
+                    out[key] = copy(v)
+                } else if (typeof v === 'function') {
+                    out[key] = v.bind(out);
+                } else {
+                    out[key] = v;
+                }
+            }
+            return out;
+         }
     }
 
     if ($templates) {
