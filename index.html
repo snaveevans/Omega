@@ -1,246 +1,244 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Omega</title>
+  </head>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Omega </title>
-</head>
-
-<body>
-
-    <div id="root"></div>
+  <body>
+    <div id="form-demo"></div>
+    <div id="http-demo"></div>
 
     <script src="omega.js"></script>
-    
+
     <script>
-        var httpFetchTest = {
-            $type: 'div',
-            _items: [],
-            _onAdd: function(item) {
-                this._items.push(item);
-            },
-            $init: function () {
-                var options = {
-                    method: "get",
-                    credentials: "same-origin",
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    }
+      var httpFetchTest = {
+        $type: "div",
+        _items: [],
+        _onAdd: function(item) {
+          this._items.push({ title: item });
+        },
+        $init: function() {
+          var options = {
+            method: "get",
+            credentials: "same-origin",
+            headers: {
+              Accept: "application/json",
+              "Content-Type": "application/json"
+            }
+          };
+
+          fetch("https://jsonplaceholder.typicode.com/posts", options)
+            .then(r => {
+              return r.json();
+            })
+            .then(posts => {
+              this._items = posts;
+            });
+        },
+        $getComponents: function() {
+          var items = this._items;
+          var onAdd = this._onAdd.bind(this);
+
+          var list = {
+            $type: "ul",
+            $getComponents: function() {
+              return items.map(function(item, index) {
+                return {
+                  $type: "My-Li",
+                  _title: item.title
                 };
-            
-                fetch('https://jsonplaceholder.typicode.com/posts', options)
-                    .then(r => {return r.json(); })
-                    .then(posts => { this._items = posts; })
+              });
+            }
+          };
+
+          var input = {
+            $type: "input",
+            className: "foobar",
+            style: "margin: 5px; width: 100%;",
+            type: "text",
+            onkeyup: function(e) {
+              if (e.keyCode !== 13) return;
+              onAdd(e.target.value);
+              this.value = "";
+            }
+          };
+
+          return [input, list];
+        }
+      };
+
+      var omega = Omega();
+
+      var userDetail = {
+        $type: "div",
+        _label: "",
+        _value: "",
+        $getComponents: function() {
+          var label = this._label;
+          var value = this._value;
+          return [
+            {
+              $type: "label",
+              style: "font-weight: bold;",
+              $text: label
             },
-            $getComponents: function() {
-                var items = this._items;
-                var onAdd = this._onAdd.bind(this);
-
-                var list = {
-                    $type: 'ul',
-                    $getComponents: function() {
-                        return items.map(function(item, index) {
-                            return {
-                                $type: 'My-Li',
-                                _title: item.title
-                            }
-                        })
-                    }
-                }
-
-                var input = {
-                    $type: 'input',
-                    className: 'foobar',
-                    style: 'margin: 5px; width: 100%;',
-                    type: 'text',
-                    onkeyup: function(e) {
-                        if (e.keyCode !== 13) 
-                            return;
-                        onAdd(e.target.value);
-                        this.value = '';
-                    }
-                }
-
-                return [
-                    input,
-                    list
-                ]
-            }
-        };
-        
-        var omega = Omega();
-
-        var userDetail = {
-            $type: 'div',
-            _label: '',
-            _value: '',
-            $getComponents: function() {
-                var label = this._label;
-                var value = this._value;
-                return [
-                    {
-                        $type: 'label',
-                        style: 'font-weight: bold;',
-                        $text: label
-                    },
-                    value
-                ]
-            }
+            value
+          ];
         }
-        omega.registerTemplate("User-Detail", userDetail);
+      };
+      omega.registerTemplate("User-Detail", userDetail);
 
-        var userView = {
-            $type: 'div',
-            _user: {},
-            $getComponents: function() {
-                var user = this._user;
-                return [
-                    {
-                        $type: 'User-Detail',
-                        _label: 'First Name:',
-                        _value: user.firstName
-                    },
-                    {
-                        $type: 'User-Detail',
-                        _label: 'Last Name:',
-                        _value: user.lastName
-                    },
-                    {
-                        $type: 'User-Detail',
-                        _label: 'Date of Birth:',
-                        _value: user.birthDate
-                    },
-                    {
-                        $type: 'User-Detail',
-                        _label: 'Email:',
-                        _value: user.email
-                    },
-                    {
-                        $type: 'User-Detail',
-                        _label: 'Phone:',
-                        _value: user.phone
-                    }
-                ]
-            }
-        }
-        omega.registerTemplate("User-View", userView);
-
-        var formInput = {
-            $type: 'div',
-            _label: '',
-            _value: '',
-            _onKeyUp: null,
-            $getComponents: function() {
-                var label = this._label;
-                var value = this._value;
-                var onKeyUp = this._onKeyUp;
-                return [
-                {
-                        $type: 'label',
-                        style: 'font-weight: bold;',
-                        $text: label
-                    },
-                    {
-                        $type: 'input',
-                        type: 'text',
-                        value: value,
-                        onkeyup: onKeyUp
-                    }
-                ]
-            }
-        }
-        
-        omega.registerTemplate("Form-Input", formInput);
-
-        var form = {
-            $type: 'div',
-            _user: { 
-                firstName: '',
-                lastName: '',
-                birthDate: '',
-                email: '',
-                phone: ''
+      var userView = {
+        $type: "div",
+        _user: {},
+        $getComponents: function() {
+          var user = this._user;
+          return [
+            {
+              $type: "User-Detail",
+              _label: "First Name:",
+              _value: user.firstName
             },
-            _onKeyUpHandler: function (prop, value) {
-                this._user[prop] = value;
+            {
+              $type: "User-Detail",
+              _label: "Last Name:",
+              _value: user.lastName
             },
-            $getComponents: function () {
-                var onKeyUpHandler = this._onKeyUpHandler.bind(this);
-                var user = this._user;
-                return [
-                    {
-                        $type: 'User-View',
-                        _user: user
-                    },
-                    {
-                        $type: 'br'
-                    },
-                    {
-                        $type: 'Form-Input',
-                        _label: 'First Name:',
-                        _value: user.firstName,
-                        _onKeyUp: function (e) {
-                            onKeyUpHandler('firstName', e.target.value);
-                        }
-                    },
-                    {
-                        $type: 'Form-Input',
-                        _label: 'Last Name:',
-                        _value: user.lastName,
-                        _onKeyUp: function (e) {
-                            onKeyUpHandler('lastName', e.target.value);
-                        }
-                    },
-                    {
-                        $type: 'Form-Input',
-                        _label: 'Birth Date:',
-                        _value: user.birthDate,
-                        _onKeyUp: function (e) {
-                            onKeyUpHandler('birthDate', e.target.value);
-                        }
-                    }
-                ]
-            }
-        }
-        
-        // omega.registerTemplate("Form", form);
-
-        var formTest = {
-            $type: 'div',
-
-        }
-
-        var myLi = {
-            $type: 'li',
-            _title: '',
-            _updateStyle: function(style) {
-                this.style = style;
+            {
+              $type: "User-Detail",
+              _label: "Date of Birth:",
+              _value: user.birthDate
             },
-            $getComponents: function () {
-                var updateStyle = this._updateStyle;
-                return [
-                    this._title,
-                    {
-                        $type: 'button',
-                        type: 'button',
-                        $text: 'style',
-                        onclick: function() {
-                            updateStyle('color: blue;');
-                        }
-                    }
-                ]
+            {
+              $type: "User-Detail",
+              _label: "Email:",
+              _value: user.email
+            },
+            {
+              $type: "User-Detail",
+              _label: "Phone:",
+              _value: user.phone
             }
-        };
+          ];
+        }
+      };
+      omega.registerTemplate("User-View", userView);
 
-        omega.registerTemplate("My-Li", myLi);
+      var formInput = {
+        $type: "div",
+        _label: "",
+        _value: "",
+        _onKeyUp: null,
+        $getComponents: function() {
+          var label = this._label;
+          var value = this._value;
+          var onKeyUp = this._onKeyUp;
+          return [
+            {
+              $type: "label",
+              style: "font-weight: bold;",
+              $text: label
+            },
+            {
+              $type: "input",
+              type: "text",
+              value: value,
+              onkeyup: onKeyUp
+            }
+          ];
+        }
+      };
 
-        var root = document.getElementById('root');
-        omega.updateElement(root, form);
-        // omega.updateElement(root, httpFetchTest);
+      omega.registerTemplate("Form-Input", formInput);
+
+      var form = {
+        $type: "div",
+        _user: {
+          firstName: "",
+          lastName: "",
+          birthDate: "",
+          email: "",
+          phone: ""
+        },
+        _onKeyUpHandler: function(prop, value) {
+          this._user[prop] = value;
+        },
+        $getComponents: function() {
+          var onKeyUpHandler = this._onKeyUpHandler.bind(this);
+          var user = this._user;
+          return [
+            {
+              $type: "User-View",
+              _user: user
+            },
+            {
+              $type: "br"
+            },
+            {
+              $type: "Form-Input",
+              _label: "First Name:",
+              _value: user.firstName,
+              _onKeyUp: function(e) {
+                onKeyUpHandler("firstName", e.target.value);
+              }
+            },
+            {
+              $type: "Form-Input",
+              _label: "Last Name:",
+              _value: user.lastName,
+              _onKeyUp: function(e) {
+                onKeyUpHandler("lastName", e.target.value);
+              }
+            },
+            {
+              $type: "Form-Input",
+              _label: "Birth Date:",
+              _value: user.birthDate,
+              _onKeyUp: function(e) {
+                onKeyUpHandler("birthDate", e.target.value);
+              }
+            }
+          ];
+        }
+      };
+
+      // omega.registerTemplate("Form", form);
+
+      var formTest = {
+        $type: "div"
+      };
+
+      var myLi = {
+        $type: "li",
+        _title: "",
+        _updateStyle: function(style) {
+          this.style = style;
+        },
+        $getComponents: function() {
+          var updateStyle = this._updateStyle;
+          return [
+            this._title,
+            {
+              $type: "button",
+              type: "button",
+              $text: "style",
+              onclick: function() {
+                updateStyle("color: blue;");
+              }
+            }
+          ];
+        }
+      };
+
+      omega.registerTemplate("My-Li", myLi);
+
+      var formDemo = document.getElementById("form-demo");
+      omega.updateElement(formDemo, form);
+      var httpDemo = document.getElementById("http-demo");
+      omega.updateElement(httpDemo, httpFetchTest);
     </script>
-</body>
-
+  </body>
 </html>
